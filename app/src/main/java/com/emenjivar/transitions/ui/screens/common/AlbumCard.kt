@@ -29,7 +29,7 @@ fun AlbumCard(
     Column(modifier = modifier) {
         Card(
             modifier = Modifier.size(coverSize),
-            shape = RoundedCornerShape(cornerRadius)
+            shape = RoundedCornerShape(LocalDimensions.cornedRadius)
         ) {
             Image(
                 modifier = Modifier.fillMaxSize(),
@@ -53,7 +53,6 @@ fun AlbumCard(
     }
 }
 
-private val cornerRadius = 16.dp
 private val coverSize = 150.dp
 private val titleFontSize = 15.sp
 private val artistFontSize = 10.sp

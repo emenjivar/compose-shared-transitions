@@ -8,4 +8,6 @@ data object LocalDimensions {
     val spaceHalf: Dp = 4.dp
     val space: Dp = 8.dp
     val spaceMed: Dp = 16.dp
+    val spaceDouble: Dp = 32.dp
+    val cornedRadius: Dp = 16.dp
 }

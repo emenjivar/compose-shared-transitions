@@ -1,5 +1,6 @@
 package com.emenjivar.transitions.ui.screens.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -23,7 +24,8 @@ import com.emenjivar.transitions.ui.theme.LocalDimensions
 fun AlbumsRow(
     title: String,
     albums: List<AlbumModel>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClickItem: (AlbumModel) -> Unit
 ) {
     Column(modifier = modifier) {
         Text(
@@ -41,7 +43,12 @@ fun AlbumsRow(
             contentPadding = PaddingValues(horizontal = horizontalSpace)
         ) {
             items(albums) { album ->
-                AlbumCard(album = album)
+                AlbumCard(
+                    modifier = Modifier.clickable {
+                        onClickItem(album)
+                    },
+                    album = album
+                )
             }
         }
     }
@@ -59,6 +66,7 @@ private fun AlbumsRowPreview() {
     )
     AlbumsRow(
         title = "Recommended songs",
-        albums = albums
+        albums = albums,
+        onClickItem = {}
     )
 }

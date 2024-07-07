@@ -1,14 +1,9 @@
 package com.emenjivar.transitions.ui.screens.home
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -20,17 +15,23 @@ import com.emenjivar.transitions.R
 import com.emenjivar.transitions.data.models.AlbumModel
 import com.emenjivar.transitions.data.models.SongModel
 import com.emenjivar.transitions.ui.theme.LocalDimensions
-import kotlinx.serialization.Serializable
+import com.emenjivar.transitions.ui.theme.TransitionsTheme
 
 @Composable
 fun HomeScreen(
     navController: NavController
 ) {
-    HomeContent()
+    HomeContent(
+        onNavToAlbum = { album ->
+            navController.navigate(album.toRoute())
+        }
+    )
 }
 
 @Composable
-fun HomeContent() {
+fun HomeContent(
+    onNavToAlbum: (AlbumModel) -> Unit
+) {
     val favoriteSongs = remember {
         listOf(
             SongModel(
@@ -87,6 +88,12 @@ fun HomeContent() {
                 artist = "Radiohead"
             ),
             AlbumModel(
+                id = 3,
+                cover = R.drawable.cover_universal_mother,
+                title = "Universal mother",
+                artist = "Sinead o'connor"
+            ),
+            AlbumModel(
                 id = 0,
                 cover = R.drawable.cover_parachutes,
                 title = "Parachutes",
@@ -111,28 +118,31 @@ fun HomeContent() {
                 item {
                     FavoritesToolRow(
                         modifier = Modifier.padding(top = topPadding),
-                        favoriteSongs = (favoriteSongs + favoriteSongs + favoriteSongs).shuffled()
+                        favoriteSongs = (favoriteSongs + favoriteSongs + favoriteSongs)
                     )
                 }
 
                 item {
                     AlbumsRow(
                         title = "Recommended songs",
-                        albums = albums.shuffled()
+                        albums = albums,
+                        onClickItem = onNavToAlbum
                     )
                 }
 
                 item {
                     AlbumsRow(
                         title = "Vintage",
-                        albums = albums.shuffled()
+                        albums = albums.reversed(),
+                        onClickItem = onNavToAlbum
                     )
                 }
 
                 item {
                     AlbumsRow(
                         title = "Mixed albums",
-                        albums = albums.shuffled()
+                        albums = albums,
+                        onClickItem = onNavToAlbum
                     )
                 }
             }
@@ -142,11 +152,12 @@ fun HomeContent() {
 
 private val topPadding = LocalDimensions.space
 
-@Serializable
-object HomeRoute
-
 @Preview
 @Composable
 private fun HomeContentPreview() {
-    HomeContent()
+    TransitionsTheme {
+        HomeContent(
+            onNavToAlbum = {}
+        )
+    }
 }
