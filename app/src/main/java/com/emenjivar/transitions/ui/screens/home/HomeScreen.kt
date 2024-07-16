@@ -4,24 +4,31 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.emenjivar.transitions.R
 import com.emenjivar.transitions.data.models.AlbumModel
 import com.emenjivar.transitions.data.models.SongModel
 import com.emenjivar.transitions.ui.theme.LocalDimensions
 import com.emenjivar.transitions.ui.theme.TransitionsTheme
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun HomeScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     HomeContent(
+        uiState = viewModel.uiState,
         onNavToAlbum = { album ->
             navController.navigate(album.toRoute())
         }
@@ -30,8 +37,10 @@ fun HomeScreen(
 
 @Composable
 fun HomeContent(
+    uiState: HomeUiState,
     onNavToAlbum: (AlbumModel) -> Unit
 ) {
+    val albumGroping by uiState.albumGrouping.collectAsStateWithLifecycle()
     val favoriteSongs = remember {
         listOf(
             SongModel(
@@ -73,41 +82,6 @@ fun HomeContent(
         )
     }
 
-    val albums = remember {
-        listOf(
-            AlbumModel(
-                id = 0,
-                cover = R.drawable.cover_parachutes,
-                title = "Parachutes",
-                artist = "Coldplay"
-            ),
-            AlbumModel(
-                id = 1,
-                cover = R.drawable.cover_sail_moon,
-                title = "Hail to the thief",
-                artist = "Radiohead"
-            ),
-            AlbumModel(
-                id = 3,
-                cover = R.drawable.cover_universal_mother,
-                title = "Universal mother",
-                artist = "Sinead o'connor"
-            ),
-            AlbumModel(
-                id = 0,
-                cover = R.drawable.cover_parachutes,
-                title = "Parachutes",
-                artist = "Coldplay"
-            ),
-            AlbumModel(
-                id = 1,
-                cover = R.drawable.cover_sail_moon,
-                title = "Hail to the thief",
-                artist = "Radiohead"
-            )
-        )
-    }
-
     Scaffold { paddingValues ->
         Surface {
             LazyColumn(
@@ -122,26 +96,10 @@ fun HomeContent(
                     )
                 }
 
-                item {
+                items(albumGroping) { grouping ->
                     AlbumsRow(
-                        title = "Recommended songs",
-                        albums = albums,
-                        onClickItem = onNavToAlbum
-                    )
-                }
-
-                item {
-                    AlbumsRow(
-                        title = "Vintage",
-                        albums = albums.reversed(),
-                        onClickItem = onNavToAlbum
-                    )
-                }
-
-                item {
-                    AlbumsRow(
-                        title = "Mixed albums",
-                        albums = albums,
+                        title = grouping.title,
+                        albums = grouping.albums,
                         onClickItem = onNavToAlbum
                     )
                 }
@@ -157,6 +115,10 @@ private val topPadding = LocalDimensions.space
 private fun HomeContentPreview() {
     TransitionsTheme {
         HomeContent(
+            uiState = HomeUiState(
+                albumGrouping = MutableStateFlow(emptyList()),
+                favoriteSongs = MutableStateFlow(emptyList())
+            ),
             onNavToAlbum = {}
         )
     }

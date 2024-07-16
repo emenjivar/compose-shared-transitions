@@ -3,10 +3,10 @@ agp = "8.2.2"
 kotlin = "1.9.0"
 bom = "2024.06.00"
 compose = "1.2.1"
-compose-ui = "1.7.0-beta04"
-navigation = "2.8.0-beta04"
+compose-ui = "1.7.0-beta05"
+navigation = "2.8.0-beta05"
 serialization = "1.6.3"
-hilt = "2.44"
+hilt = "2.51.1"
 
 [libraries]
 # androidx
@@ -17,6 +17,7 @@ androidx-activity = { group = "androidx.activity", name = "activity-compose", ve
 # dependency injection
 dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version = "1.2.0" }
 
 # boom
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "bom" }
