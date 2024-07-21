@@ -9,5 +9,11 @@ enum class AlbumElement {
 
 data class AlbumKey(
     val albumId: Int,
-    val elementType: AlbumElement
+    val elementType: AlbumElement,
+    val origin: OriginTransition
 )
+
+enum class OriginTransition {
+    TOOLBOX,
+    CARD
+}

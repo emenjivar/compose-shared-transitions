@@ -39,7 +39,8 @@ fun SharedTransitionScope.AlbumCard(
                 rememberSharedContentState(
                     key = AlbumKey(
                         albumId = album.id,
-                        elementType = AlbumElement.CONTAINER
+                        elementType = AlbumElement.CONTAINER,
+                        origin = OriginTransition.CARD
                     )
                 ),
                 animatedVisibilityScope = animatedContentScope
@@ -51,7 +52,8 @@ fun SharedTransitionScope.AlbumCard(
                     rememberSharedContentState(
                         key = AlbumKey(
                             albumId = album.id,
-                            elementType = AlbumElement.IMAGE
+                            elementType = AlbumElement.IMAGE,
+                            origin = OriginTransition.CARD
                         )
                     ),
                     animatedVisibilityScope = animatedContentScope
@@ -77,7 +79,8 @@ fun SharedTransitionScope.AlbumCard(
                 rememberSharedContentState(
                     key = AlbumKey(
                         albumId = album.id,
-                        elementType = AlbumElement.TITLE
+                        elementType = AlbumElement.TITLE,
+                        origin = OriginTransition.CARD
                     )
                 ),
                 animatedVisibilityScope = animatedContentScope

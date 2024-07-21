@@ -13,21 +13,25 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -36,13 +40,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.emenjivar.transitions.R
+import com.emenjivar.transitions.data.models.AlbumModel
 import com.emenjivar.transitions.ui.components.DefaultIconButton
 import com.emenjivar.transitions.ui.screens.common.AlbumElement
 import com.emenjivar.transitions.ui.screens.common.AlbumKey
+import com.emenjivar.transitions.ui.screens.common.OriginTransition
+import com.emenjivar.transitions.ui.screens.home.SharedTransitionLayoutPreview
 import com.emenjivar.transitions.ui.theme.LocalDimensions
-import com.emenjivar.transitions.ui.theme.TransitionsTheme
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -50,12 +59,14 @@ fun AlbumDetailScreen(
     navController: NavController,
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
-    args: AlbumDetailRoute
+    args: AlbumDetailRoute,
+    viewModel: AlbumDetailViewModel = hiltViewModel()
 ) {
     with(sharedTransitionScope) {
         AlbumDetailContent(
             animatedContentScope = animatedContentScope,
             args = args,
+            uiState = viewModel.uiState,
             onNavBack = { navController.popBackStack() }
         )
     }
@@ -66,14 +77,17 @@ fun AlbumDetailScreen(
 fun SharedTransitionScope.AlbumDetailContent(
     animatedContentScope: AnimatedContentScope,
     args: AlbumDetailRoute,
+    uiState: AlbumDetailUiState,
     onNavBack: () -> Unit
 ) {
+    val songs by uiState.songs.collectAsStateWithLifecycle()
     Scaffold(
         modifier = Modifier.sharedBounds(
             rememberSharedContentState(
                 key = AlbumKey(
                     albumId = args.id,
-                    elementType = AlbumElement.CONTAINER
+                    elementType = AlbumElement.CONTAINER,
+                    origin = args.getOriginTransition()
                 )
             ),
             animatedVisibilityScope = animatedContentScope
@@ -114,7 +128,8 @@ fun SharedTransitionScope.AlbumDetailContent(
                 .fillMaxSize()
                 .background(Color.White)
                 .padding(paddingValues)
-                .padding(horizontal = LocalDimensions.spaceMed),
+                .padding(horizontal = LocalDimensions.spaceMed)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Card(
@@ -123,7 +138,8 @@ fun SharedTransitionScope.AlbumDetailContent(
                         rememberSharedContentState(
                             key = AlbumKey(
                                 albumId = args.id,
-                                elementType = AlbumElement.IMAGE
+                                elementType = AlbumElement.IMAGE,
+                                origin = args.getOriginTransition()
                             )
                         ),
                         animatedVisibilityScope = animatedContentScope
@@ -136,6 +152,7 @@ fun SharedTransitionScope.AlbumDetailContent(
             ) {
                 Image(
                     modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
                         .fillMaxSize(),
                     painter = painterResource(id = args.cover),
                     contentScale = ContentScale.Crop,
@@ -148,7 +165,8 @@ fun SharedTransitionScope.AlbumDetailContent(
                     rememberSharedContentState(
                         key = AlbumKey(
                             albumId = args.id,
-                            elementType = AlbumElement.TITLE
+                            elementType = AlbumElement.TITLE,
+                            origin = args.getOriginTransition()
                         )
                     ),
                     animatedVisibilityScope = animatedContentScope
@@ -171,22 +189,20 @@ fun SharedTransitionScope.AlbumDetailContent(
                 color = Color.Black.copy(alpha = 0.7f)
             )
 
-            repeat(10) {
-                Column(
+            Spacer(modifier = Modifier.height(LocalDimensions.spaceMed))
+            songs.forEachIndexed { index, song ->
+                SongItem(
                     modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = LocalDimensions.spaceQuarter)
                         .animateVertical(
                             animatedContentScope,
-                            delay = 70 * it
+                            delay = 70 * index
                         ),
-                ) {
-                    Text(
-                        text = "Song #$it",
-                        color = Color.Black,
-                        fontSize = songFontSize
-                    )
-                    HorizontalDivider(color = Color.Black)
-                }
+                    song = song
+                )
             }
+            Spacer(modifier = Modifier.height(LocalDimensions.spaceMed))
         }
     }
 }
@@ -205,21 +221,26 @@ private fun Modifier.animateVertical(
     delay: Int
 ) = with(animatedContentScope) {
     animateEnterExit(
-        enter = fadeIn(tween(delayMillis = delay)) + slideInVertically { it * 3 },
-        exit = fadeOut(tween(delayMillis = delay)) + slideOutVertically { it * 3 }
+        enter = fadeIn(tween(delayMillis = delay)) + slideInVertically { it * 4 },
+        exit = fadeOut(tween(delayMillis = delay)) + slideOutVertically { it * 4 }
     )
 }
 
 private val titleFontSize = 24.sp
 private val descriptionFontSize = 13.sp
-private val songFontSize = 13.sp
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Preview
 @Composable
 private fun AlbumDetailContentPreview() {
-    TransitionsTheme {
-//        AlbumDetailContent(
-//            args = AlbumModel.preview1.toRoute()
-//        )
+    SharedTransitionLayoutPreview { transitionScope ->
+        transitionScope.AlbumDetailContent(
+            args = AlbumModel.preview1.toRoute(OriginTransition.TOOLBOX),
+            animatedContentScope = this,
+            onNavBack = {},
+            uiState = AlbumDetailUiState(
+                songs = MutableStateFlow(emptyList())
+            )
+        )
     }
 }

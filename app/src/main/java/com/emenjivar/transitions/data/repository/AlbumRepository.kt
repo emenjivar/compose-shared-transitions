@@ -4,12 +4,12 @@ import com.emenjivar.transitions.R
 import com.emenjivar.transitions.data.models.AlbumGroup
 import com.emenjivar.transitions.data.models.AlbumModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlin.random.Random
 
 interface AlbumRepository {
-    fun getRecommended(): Flow<AlbumGroup>
-    fun getVintage(): Flow<AlbumGroup>
+    fun getGroupedAlbums(): Flow<List<AlbumGroup>>
+    fun getAlbums(): Flow<List<AlbumModel>>
 }
 
 class AlbumRepositoryImp : AlbumRepository {
@@ -46,23 +46,41 @@ class AlbumRepositoryImp : AlbumRepository {
         ),
         AlbumModel(
             id = 6,
-            cover = R.drawable.cover_mercedes_sosa,
-            title = "Censurada",
-            artist = "Mercedes sosa"
+            cover = R.drawable.cover_all_moon_shaped,
+            title = "All Moon Shaped",
+            artist = "Radiohead"
+        ),
+        AlbumModel(
+            id = 7,
+            cover = R.drawable.cover_lateralus,
+            title = "Lateralus",
+            artist = "Tool"
+        ),
+        AlbumModel(
+            id = 8,
+            cover = R.drawable.cover_red_roses,
+            title = "Red Rose Speedway",
+            artist = "Paul McCartney"
+        ),
+    )
+
+    override fun getGroupedAlbums() = flowOf(
+        listOf(
+            AlbumGroup(
+                title = "Recommended albums",
+                albums = albums.shuffled().take(5).map { it.copy(id = Random.nextInt()) }
+            ),
+            AlbumGroup(
+                title = "Vintage",
+                albums = albums.shuffled().take(5).map { it.copy(id = Random.nextInt()) }
+            ),
+            AlbumGroup(
+                title = "According to your mood",
+                albums = albums.shuffled().take(5).map { it.copy(id = Random.nextInt()) }
+            )
         )
     )
 
-    override fun getRecommended() = flowOf(
-        AlbumGroup(
-            title = "Recommended albums",
-            albums = albums.take(4)
-        )
-    )
+    override fun getAlbums() = flowOf(albums)
 
-    override fun getVintage() = flowOf(
-        AlbumGroup(
-            title = "Vintage",
-            albums = albums.takeLast(1)
-        )
-    )
 }

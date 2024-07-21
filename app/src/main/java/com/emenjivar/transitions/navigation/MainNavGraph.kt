@@ -25,10 +25,10 @@ fun MainNavGraph(
             startDestination = HomeRoute
         ) {
             composable<HomeRoute>(
-                enterTransition = { EnterTransition.None },
-                exitTransition = { ExitTransition.None },
-                popEnterTransition = { EnterTransition.None },
-                popExitTransition = { ExitTransition.None }
+//                enterTransition = { EnterTransition.None },
+//                exitTransition = { ExitTransition.None },
+//                popEnterTransition = { EnterTransition.None },
+//                popExitTransition = { ExitTransition.None }
             ) {
                 HomeScreen(
                     navController = navController,
@@ -37,10 +37,10 @@ fun MainNavGraph(
                 )
             }
             composable<AlbumDetailRoute>(
-                enterTransition = { EnterTransition.None },
-                exitTransition = { ExitTransition.None },
-                popEnterTransition = { EnterTransition.None },
-                popExitTransition = { ExitTransition.None }
+//                enterTransition = { EnterTransition.None },
+//                exitTransition = { ExitTransition.None },
+//                popEnterTransition = { EnterTransition.None },
+//                popExitTransition = { ExitTransition.None }
             ) {
                 AlbumDetailScreen(
                     navController = navController,
