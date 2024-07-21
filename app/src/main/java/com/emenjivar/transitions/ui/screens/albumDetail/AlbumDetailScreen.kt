@@ -59,13 +59,11 @@ fun AlbumDetailScreen(
     navController: NavController,
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
-    args: AlbumDetailRoute,
     viewModel: AlbumDetailViewModel = hiltViewModel()
 ) {
     with(sharedTransitionScope) {
         AlbumDetailContent(
             animatedContentScope = animatedContentScope,
-            args = args,
             uiState = viewModel.uiState,
             onNavBack = { navController.popBackStack() }
         )
@@ -76,7 +74,6 @@ fun AlbumDetailScreen(
 @Composable
 fun SharedTransitionScope.AlbumDetailContent(
     animatedContentScope: AnimatedContentScope,
-    args: AlbumDetailRoute,
     uiState: AlbumDetailUiState,
     onNavBack: () -> Unit
 ) {
@@ -85,9 +82,9 @@ fun SharedTransitionScope.AlbumDetailContent(
         modifier = Modifier.sharedBounds(
             rememberSharedContentState(
                 key = AlbumKey(
-                    albumId = args.id,
+                    albumId = uiState.album.id,
                     elementType = AlbumElement.CONTAINER,
-                    origin = args.getOriginTransition()
+                    origin = uiState.origin
                 )
             ),
             animatedVisibilityScope = animatedContentScope
@@ -100,7 +97,7 @@ fun SharedTransitionScope.AlbumDetailContent(
                             Text(
                                 modifier = Modifier
                                     .animateFadeIn(animatedContentScope),
-                                text = args.artist,
+                                text = uiState.album.artist,
                                 color = Color.Black
                             )
                         }
@@ -137,9 +134,9 @@ fun SharedTransitionScope.AlbumDetailContent(
                     .sharedElement(
                         rememberSharedContentState(
                             key = AlbumKey(
-                                albumId = args.id,
+                                albumId = uiState.album.id,
                                 elementType = AlbumElement.IMAGE,
-                                origin = args.getOriginTransition()
+                                origin = uiState.origin
                             )
                         ),
                         animatedVisibilityScope = animatedContentScope
@@ -154,7 +151,7 @@ fun SharedTransitionScope.AlbumDetailContent(
                     modifier = Modifier
                         .clip(RoundedCornerShape(16.dp))
                         .fillMaxSize(),
-                    painter = painterResource(id = args.cover),
+                    painter = painterResource(id = uiState.album.cover),
                     contentScale = ContentScale.Crop,
                     contentDescription = null
                 )
@@ -164,14 +161,14 @@ fun SharedTransitionScope.AlbumDetailContent(
                 modifier = Modifier.sharedBounds(
                     rememberSharedContentState(
                         key = AlbumKey(
-                            albumId = args.id,
+                            albumId = uiState.album.id,
                             elementType = AlbumElement.TITLE,
-                            origin = args.getOriginTransition()
+                            origin = uiState.origin
                         )
                     ),
                     animatedVisibilityScope = animatedContentScope
                 ),
-                text = args.title,
+                text = uiState.album.title,
                 fontSize = titleFontSize,
                 fontWeight = FontWeight.Medium,
                 color = Color.Black
@@ -235,10 +232,11 @@ private val descriptionFontSize = 13.sp
 private fun AlbumDetailContentPreview() {
     SharedTransitionLayoutPreview { transitionScope ->
         transitionScope.AlbumDetailContent(
-            args = AlbumModel.preview1.toRoute(OriginTransition.TOOLBOX),
             animatedContentScope = this,
             onNavBack = {},
             uiState = AlbumDetailUiState(
+                album = AlbumModel.preview1,
+                origin = OriginTransition.CARD,
                 songs = MutableStateFlow(emptyList())
             )
         )

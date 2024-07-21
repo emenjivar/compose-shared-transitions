@@ -1,7 +1,9 @@
 package com.emenjivar.transitions.ui.screens.albumDetail
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.emenjivar.transitions.data.models.SongModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -11,7 +13,12 @@ import javax.inject.Inject
 import kotlin.random.Random
 
 @HiltViewModel
-class AlbumDetailViewModel @Inject constructor(): ViewModel() {
+class AlbumDetailViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle
+) : ViewModel() {
+
+    private val args = savedStateHandle.toRoute<AlbumDetailRoute>()
+    private val albumModel = args.toModel()
 
     private val mockTitles = listOf(
         "The Golden Age",
@@ -42,6 +49,8 @@ class AlbumDetailViewModel @Inject constructor(): ViewModel() {
     )
 
     val uiState = AlbumDetailUiState(
+        album = albumModel,
+        origin = args.getOriginTransition(),
         songs = songs
     )
 }

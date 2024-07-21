@@ -1,5 +1,6 @@
 package com.emenjivar.transitions.ui.screens.albumDetail
 
+import com.emenjivar.transitions.data.models.AlbumModel
 import com.emenjivar.transitions.ui.screens.common.OriginTransition
 import kotlinx.serialization.Serializable
 
@@ -18,4 +19,11 @@ data class AlbumDetailRoute(
         OriginTransition.CARD.name -> OriginTransition.CARD
         else -> OriginTransition.TOOLBOX
     }
+
+    fun toModel() = AlbumModel(
+        id = this.id,
+        cover = this.cover,
+        title = this.title,
+        artist = this.artist
+    )
 }
