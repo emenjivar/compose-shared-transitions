@@ -1,5 +1,8 @@
 package com.emenjivar.transitions.ui.screens.home
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -19,25 +22,32 @@ import com.emenjivar.transitions.R
 import com.emenjivar.transitions.data.models.AlbumModel
 import com.emenjivar.transitions.data.models.SongModel
 import com.emenjivar.transitions.ui.theme.LocalDimensions
-import com.emenjivar.transitions.ui.theme.TransitionsTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    HomeContent(
-        uiState = viewModel.uiState,
-        onNavToAlbum = { album ->
-            navController.navigate(album.toRoute())
-        }
-    )
+    with(sharedTransitionScope) {
+        HomeContent(
+            uiState = viewModel.uiState,
+            animatedContentScope = animatedContentScope,
+            onNavToAlbum = { album ->
+                navController.navigate(album.toRoute())
+            }
+        )
+    }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun HomeContent(
+fun SharedTransitionScope.HomeContent(
     uiState: HomeUiState,
+    animatedContentScope: AnimatedContentScope,
     onNavToAlbum: (AlbumModel) -> Unit
 ) {
     val albumGroping by uiState.albumGrouping.collectAsStateWithLifecycle()
@@ -100,6 +110,7 @@ fun HomeContent(
                     AlbumsRow(
                         title = grouping.title,
                         albums = grouping.albums,
+                        animatedContentScope = animatedContentScope,
                         onClickItem = onNavToAlbum
                     )
                 }
@@ -110,16 +121,18 @@ fun HomeContent(
 
 private val topPadding = LocalDimensions.space
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Preview
 @Composable
 private fun HomeContentPreview() {
-    TransitionsTheme {
-        HomeContent(
+    SharedTransitionLayoutPreview { transitionScope ->
+        transitionScope.HomeContent(
             uiState = HomeUiState(
                 albumGrouping = MutableStateFlow(emptyList()),
                 favoriteSongs = MutableStateFlow(emptyList())
             ),
-            onNavToAlbum = {}
+            onNavToAlbum = {},
+            animatedContentScope = this
         )
     }
 }

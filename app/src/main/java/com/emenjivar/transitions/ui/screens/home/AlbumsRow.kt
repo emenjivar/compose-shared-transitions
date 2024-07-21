@@ -1,5 +1,10 @@
 package com.emenjivar.transitions.ui.screens.home
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,11 +24,13 @@ import com.emenjivar.transitions.data.models.AlbumModel
 import com.emenjivar.transitions.ui.screens.common.AlbumCard
 import com.emenjivar.transitions.ui.theme.LocalDimensions
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 @Stable
-fun AlbumsRow(
+fun SharedTransitionScope.AlbumsRow(
     title: String,
     albums: List<AlbumModel>,
+    animatedContentScope: AnimatedContentScope,
     modifier: Modifier = Modifier,
     onClickItem: (AlbumModel) -> Unit
 ) {
@@ -33,7 +40,7 @@ fun AlbumsRow(
                 .padding(start = LocalDimensions.spaceMed)
                 .padding(bottom = LocalDimensions.space),
             text = title,
-            color = Color.White,
+            color = Color.Black,
             fontSize = titleFontSize,
             fontWeight = FontWeight.Medium
         )
@@ -47,7 +54,8 @@ fun AlbumsRow(
                     modifier = Modifier.clickable {
                         onClickItem(album)
                     },
-                    album = album
+                    album = album,
+                    animatedContentScope = animatedContentScope
                 )
             }
         }
@@ -57,6 +65,7 @@ fun AlbumsRow(
 private val titleFontSize = 18.sp
 private val horizontalSpace = LocalDimensions.space
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Preview
 @Composable
 private fun AlbumsRowPreview() {
@@ -64,9 +73,29 @@ private fun AlbumsRowPreview() {
         AlbumModel.preview1,
         AlbumModel.preview2
     )
-    AlbumsRow(
-        title = "Recommended songs",
-        albums = albums,
-        onClickItem = {}
-    )
+    SharedTransitionLayoutPreview { transitionScope ->
+        transitionScope.AlbumsRow(
+            title = "Recommended songs",
+            albums = albums,
+            animatedContentScope = this,
+            onClickItem = {}
+        )
+    }
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+fun SharedTransitionLayoutPreview(
+    content: @Composable AnimatedContentScope.(transitionScope: SharedTransitionScope) -> Unit
+) {
+    SharedTransitionLayout {
+        AnimatedContent(
+            targetState = true,
+            label = "preview"
+        ) { display ->
+            if (display) {
+                content(this@SharedTransitionLayout)
+            }
+        }
+    }
 }

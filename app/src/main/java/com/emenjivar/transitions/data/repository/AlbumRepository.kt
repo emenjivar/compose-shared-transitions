@@ -4,6 +4,7 @@ import com.emenjivar.transitions.R
 import com.emenjivar.transitions.data.models.AlbumGroup
 import com.emenjivar.transitions.data.models.AlbumModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 
 interface AlbumRepository {
@@ -54,14 +55,14 @@ class AlbumRepositoryImp : AlbumRepository {
     override fun getRecommended() = flowOf(
         AlbumGroup(
             title = "Recommended albums",
-            albums = albums.shuffled().take(4)
+            albums = albums.take(4)
         )
     )
 
     override fun getVintage() = flowOf(
         AlbumGroup(
             title = "Vintage",
-            albums = albums.shuffled().take(4)
+            albums = albums.takeLast(1)
         )
     )
 }
