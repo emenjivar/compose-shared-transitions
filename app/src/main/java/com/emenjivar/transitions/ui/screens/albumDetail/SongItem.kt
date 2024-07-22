@@ -57,7 +57,7 @@ fun SongItem(
             )
 
             Text(
-                text = "${song.artist} - ${song.getFormattedTime()}",
+                text = song.getFormattedTime(),
                 fontSize = 14.sp,
                 color = Color.Black.copy(alpha = ALPHA_SUB_TEXT)
             )

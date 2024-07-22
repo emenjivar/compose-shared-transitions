@@ -37,9 +37,8 @@ class AlbumDetailViewModel @Inject constructor(
             SongModel(
                 id = index,
                 title = title,
-                artist = "Artist",
                 cover = 0,
-                duration = Random.nextLong() % 1_800
+                duration = Random.nextLong() % 18_000
             )
         }
     ).stateIn(
